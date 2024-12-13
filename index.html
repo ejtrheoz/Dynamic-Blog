@@ -1,0 +1,466 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Illia Volk"/>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <!-- <link rel="stylesheet"
+          href="css/treesBlog.css"
+          media="screen"/> -->
+    
+    <!-- <link rel="stylesheet", href="css/style.css"> -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>Travel Blog</title>
+</head>
+
+<body>
+<header>
+    <h1>Travel Blog</h1>
+    
+
+
+<div class="menu">
+    <button id="menuTitle">Menu</button>
+
+    <nav id="menuIts" class="menu mnHide">
+        <a href="#welcome">Welcome!</a>
+        <a href="#articles">Articles</a>
+        <a href="#opinions">Visitor opinions</a>
+        <a href="#addOpinion">Add your opinion</a>
+        <a href="#artInsert">Add article</a>
+        <!-- Update the link HTML -->
+        <div id="changeLink" class="hidden dropdown-trigger">
+            <a id="optionsLink">Manage Article ▼</a>
+            
+            <div class="dropdown-menu">
+                <a id="artEdit" class="dropdown-item">Edit</a>
+                <a id="artDelete" class="dropdown-item">Delete</a>
+            </div>
+        </div>
+    </nav>
+
+    
+</div>
+
+<dialog id="dialog">
+    <div id="loginButton">
+        <div id="g_id_onload"
+        data-client_id="781467454728-pn92npu6tfmcc7l2c49cm33njfkk8t87.apps.googleusercontent.com"
+        data-context="signin"
+        data-ux_mode="popup"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin"
+        data-type="standard"
+        data-shape="rectangular"
+        data-theme="outline"
+        data-text="signin_with"
+        data-size="large"
+        data-width="250"
+        data-logo_alignment="left">
+        </div>
+    </div>
+</dialog>
+</header>
+
+
+
+
+
+<main id="router-view">
+</main>
+
+<!-- <a href="mailto:comp140609@gmail.com">Illia Volk. Send me an email.</a> -->
+
+
+<!--Templates for html, dynamically inserted by the router -->
+
+
+
+<script id="template-welcome" type="text/template">
+    <div class="margin"></div>
+    <div class="content">
+        <article>
+            <h2>Welcome!</h2>
+            <p>
+                Discover the world one destination at a time with our travel blog, where we share tips, itineraries, and hidden gems for the modern explorer. From bustling cities to tranquil getaways, let us inspire your next adventure with authentic experiences and local insights.
+            </p>
+            <button id="authButton" class="hidden">Authentication</button>
+            <button id="sign-out-button" class="hidden">Sign Out</button>
+
+        </article>
+    </div>
+</script>
+
+<script>
+    function handleCredentialResponse(response) {
+        token = response.credential;
+        token = token.split(".");
+        payload = JSON.parse(atob(token[1]));
+        dialog.close();
+
+        localStorage.setItem("user", payload.given_name + " " + payload.family_name);
+        document.getElementById('sign-out-button').style.display = 'block';
+        document.getElementById("authButton").classList.add("hidden");
+    }
+
+    window.addEventListener("hashchange", function () {
+        if (window.location.hash.includes("article/")) {
+        document.getElementById("changeLink").classList.remove("hidden");
+        }
+        else {
+            document.getElementById("changeLink").classList.add("hidden");
+        }
+    });
+
+    // Add this JavaScript
+
+    document.querySelector('.dropdown-trigger').addEventListener('click', function(e) {
+    e.stopPropagation();
+    this.querySelector('.dropdown-menu').classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-trigger')) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('show');
+        });
+    }
+    });
+
+</script>
+
+<script id="template-articles" type="text/template">
+    <div class="margin"></div>
+    {{#articles}}
+    <div class="articleDemo">
+        <article>
+            <h2><a id="articleLink" href="{{detailLink}}">{{title}}</a></h2>  
+            <p>
+            by {{author}}
+            </p>
+            
+            {{content}}
+
+    </article>
+    </div>
+
+    {{/articles}}
+
+</script>
+
+
+
+
+<script id="template-articles-error" type="text/template">
+    <div class="margin"></div>
+
+    <article>
+        <h2>Articles acquisition failed</h2>
+        <p>
+            {{errMessage}}
+        </p>
+    </article>
+    <footer  class="menuLink"><a href="#menuTitle">Back to the menu</a></footer>
+
+</script>  
+
+
+
+<!--JavaScript code, inserted as a module-->
+<script  type="module" src="js/index.js"></script>
+
+<script id="template-opinions" type="text/template">
+    <div class="margin"></div>
+    <article  id="artOpinions">
+        <div id="opinionsContainer">
+            <h2>Visitor Opinions</h2>
+            {{#.}}
+            <div class="content">
+                <h3>{{name}} ({{created}})</h3>
+                <p>{{comment}}</p>
+                <p>{{email}}</p>
+                <p>{{keywords}}</p>
+                <p>{{sentiment}}</p>
+
+                {{#image}}<img width="20%" height="20%" src="{{image}}" alt="{{name}}'s image">{{/image}}
+            </div>
+            {{/.}}
+            {{^.}}
+            <section>
+                Sorry, no opinions found.
+            </section>
+            {{/.}}
+        </div>
+    </article>
+
+    
+</script>     
+
+
+<script id="template-addOpinion" type="text/template">
+    <div class="margin"></div>
+    <div class="opinion">
+        <article  id="artOpnFrm">
+            <form id="opnFrm">
+                <div class="input-section">
+                  <label for="name-input" class="input-label">Leave your opinion</label>
+                  <input type="text" id="name-input" placeholder="Enter your name" class="styled-input" required>
+                  <input type="email" id="email-input" placeholder="Enter your email" class="styled-input" required>
+                  <input type="url" id="image-input" placeholder="Enter url for image" class="styled-input">
+          
+                  <textarea class="styled-input" id="comment" name="comment" rows="4" cols="50" placeholder="Leave your comment" required></textarea><br>
+                  <br>
+          
+                  <label for="keywords">Enter relevant keywords:</label><br>
+          
+                  <input class="styled-input" type="text" id="keywords" name="keywords" list="keyword-list" placeholder="Enter keywords here...">
+                  <br><br>
+          
+                  <datalist id="keyword-list">
+                      <option value="Travel">
+                      <option value="Germany">
+                      <option value="Adventure">
+                      <option value="History">
+                      <option value="Culture">
+                      <option value="Bratislava">
+                      <option value="Monaco">
+                      <option value="Luxury">
+                      <option value="City Break">
+                      <option value="Nature">
+                  </datalist>
+          
+                  <label for="allowSentiment">
+                    <input type="checkbox" id="allowSentiment" class="radio-input">
+                    Would you like to tell your comment sentiment?
+                  </label><br>
+          
+                  <div id="radioOptions" class="radio-options">
+                    <label for="goodReview" class="input-label">Your comment emotions</label>
+                    <label for="goodReview">
+                        <input type="radio" id="goodReview" name="reviewSentiment" value="positive" class="radio-input">
+                        Positive
+                    </label><br>
+          
+                    <label for="badReview">
+                        <input type="radio" id="badReview" name="reviewSentiment" value="negative" class="radio-input">
+                        Negative
+                    </label><br><br>
+                  </div>
+          
+                  <button type="reset">Reset</button>
+                  <button type="submit">Submit</button>
+          
+                
+                </div>
+              </form>
+        </article>
+    </div>
+    
+
+    <script id="mTmplOneOpinion" type="text/template">
+
+        <section>
+            <h3>{{name}} Created {{created}}</h3>
+            <p>{{comment}}</p>
+            <p>{{email}}</p>
+            <p>{{keywords}}</p>
+            <p>{{sentiment}}</p>
+    
+            {{#image}}<img src="{{image}}" alt="{{name}}'s image">{{/image}}
+    
+        </section>
+    
+      
+    </script>
+
+</script>
+
+<script id="template-article" type="text/template">
+    <div class="margin"></div>
+    <a href="{{backLink}}" class="buttonBack"><img class="imgButton" src="fig/back.png"></a>
+    <div class="content">
+        <article>
+            
+            <h3>{{title}}</h3>
+            <p>
+                by {{author}}
+            </p>
+            <p>
+                {{dateCreated}}
+            </p>
+            {{#imageLink}}
+
+            <img id="imageArticle" width="150%" height="150%" src="{{imageLink}}" alt="article figure" />
+
+            {{/imageLink}}
+            <div>{{{content}}}</div>
+        </article>
+
+        
+    </div>
+    
+    <div id="formAddComment">
+    </div>
+
+    <h2 id="commentTitle">Comments<h2>
+    {{#comments}}
+
+        <div class="content">
+            
+            <p>{{author}} ({{dateCreated}})</p>
+            <p>{{text}}</p>
+
+        </div>
+            
+        
+    {{/comments}}
+    
+    
+    
+    
+    <div id="links">
+    </div>
+    <button id="upButton" class="bottom-right-button hidden"><img src="fig/arrow.png" alt="Up arrow" width="20" height="20"></button>
+</script>
+
+
+<script id="template-article-form" type="text/template">
+    <div class="margin"></div>
+    <article>
+        <h2>{{formTitle}}</h2> <br><br>
+
+        <form id="articleForm">
+            <label for="author">Author:</label>
+            <br>
+            <input type="text" class="styled-input" name="author" id="author" value="{{author}}" size="50" 
+                   title="Article author, max. length 100 characters." 
+                   maxlength="100" placeholder="e.g. Ján Trieska" />
+            <br>
+            <label for="title">Title:</label>
+            <br>
+            <input type="text" name="title" id="title" value="{{title}}" size="50"  class="styled-input"
+                   maxlength="100" pattern="\S[\S\s]*" placeholder="e.g. My story." required 
+                   title="Article title, mandatory item, max. length: 100 characters. 
+The first character must not be a space."  />
+            <br>
+            <label for="imageLink">Image (url):</label>
+            <br>
+            <input class="styled-input" type="url" name="imageLink" id="imageLink" value="{{imageLink}}" size="50" 
+                   title="Image URL, max. length 100 characters." maxlength="100"/>
+            <br><br>
+            <button type="button" id="btShowFileUpload">
+                Upload image
+            </button>
+            <br><br>
+
+            <fieldset class="added hiddenElm" id="fsetFileUpload">
+                <legend>Image Upload</legend>
+                <input class="input-label" type="file" id="flElm" name="file" accept="image/jpeg, image/png"/>
+                <br />
+                <button type="button" id="btFileUpload">
+                    Send image to server </button>
+                <button type="button" id="btCancelFileUpload">
+                    Cancel uploading </button>
+            </fieldset>
+
+
+            <br>
+            <label for="content">Article content:</label>
+            <br>
+            <textarea
+                    name="content" id="content" spellcheck="true" lang="sk" class="styled-input"
+                    cols="50" rows="20" required
+                    title="Article content, mandatory item, can be plain text or in HTML.">
+              {{content}}
+            </textarea>
+            <br>
+            <label for="tags">Keywords:</label>
+            <br>
+            <input  type="text" name="tags" id="tags" value="{{tags}}" size="50" class="styled-input"
+                    title="Keyword list, comma separated." placeholder="e.g. village, drama" />
+            <br> <br>
+            <button type="reset"> Reset Form </button>
+            <button type="submit"> {{submitBtTitle}} </button>
+
+        </form>
+    </article>
+
+    <a href="{{backLink}}" class="buttonBack"><img src="fig/back.png"></a>
+
+</script>  
+
+
+<script id="template-article-form-add" type="text/template">
+    <div class="margin"></div>
+    <div class="content">
+        <h2>Add article</h2> <br><br>
+
+        <form id="articleForm">
+            <label for="author">Author:</label>
+            <br>
+            <input type="text" class="styled-input" name="author" id="author" value="" size="50" 
+                   title="Article author, max. length 100 characters." 
+                   maxlength="100" placeholder="e.g. Ján Trieska" />
+            <br>
+            <label for="title">Title:</label>
+            <br>
+            <input type="text" name="title" id="title" value="" size="50"  class="styled-input"
+                   maxlength="100" pattern="\S[\S\s]*" placeholder="e.g. My story." required 
+                   title="Article title, mandatory item, max. length: 100 characters. 
+The first character must not be a space."  />
+            <br>
+            <label for="imageLink">Image (url):</label>
+            <br>
+            <input class="styled-input" type="url" name="imageLink" id="imageLink" value="" size="50" 
+                   title="Image URL, max. length 100 characters." maxlength="100"/>
+            <br><br>
+            <button type="button" id="btShowFileUpload">
+                Upload image
+            </button>
+            <br><br>
+
+            <fieldset class="added hiddenElm" id="fsetFileUpload">
+                <legend>Image Upload</legend>
+                <input class="input-label" type="file" id="flElm" name="file" accept="image/jpeg, image/png"/>
+                <br />
+                <button type="button" id="btFileUpload">
+                    Send image to server </button>
+                <button type="button" id="btCancelFileUpload">
+                    Cancel uploading </button>
+            </fieldset>
+
+
+            <br>
+            <label for="content">Article content:</label>
+            <br>
+            <textarea
+                    name="content" id="content" spellcheck="true" lang="sk" class="styled-input" value=""
+                    cols="50" rows="20" required
+                    title="Article content, mandatory item, can be plain text or in HTML.">
+            </textarea>
+            <br>
+            <label for="tags">Keywords:</label>
+            <br>
+            <input  type="text" name="tags" id="tags" value="" size="50" class="styled-input"
+                    title="Keyword list, comma separated." placeholder="e.g. village, drama" />
+            <br> <br>
+            <button type="reset"> Reset Form </button>
+            <button type="submit"> Upload Article </button>
+
+        </form>
+    </div>
+
+</script>
+
+
+
+</body>
+</html>
