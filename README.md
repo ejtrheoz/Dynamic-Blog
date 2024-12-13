@@ -6,3 +6,4 @@ Blog Activities:
 - Add own articles
 - Login with google
 - Add opinion about website
+Link: https://ejtrheoz.github.io/Dynamic-Blog

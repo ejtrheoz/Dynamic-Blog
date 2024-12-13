@@ -196,7 +196,7 @@ function getTotalCount()
 
 function fetchArticleContent(articleId) {
     return new Promise((resolve, reject) => {
-        const url = `http://wt.kpi.fei.tuke.sk/api/article/${articleId}`;
+        const url = `https://wt.kpi.fei.tuke.sk/api/article/${articleId}`;
         const ajax = new XMLHttpRequest();
         ajax.addEventListener("load", function () {
             if (this.status === 200) {
@@ -419,7 +419,7 @@ function fetchAndDisplayArticleDetail(targetElm,artIdFromHash,offsetFromHash,tot
 
 function fetchArticleComments(articleId, offset = 0, max = 10) {
     return new Promise((resolve, reject) => {
-        const url = `http://wt.kpi.fei.tuke.sk/api/article/${articleId}/comment?max=${max}&offset=${offset}`;
+        const url = `https://wt.kpi.fei.tuke.sk/api/article/${articleId}/comment?max=${max}&offset=${offset}`;
         const ajax = new XMLHttpRequest();
         ajax.addEventListener("load", function () {
             if (this.status === 200) {
